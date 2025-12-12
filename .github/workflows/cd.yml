@@ -1,0 +1,37 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+
+      - name: Prepare GitHub Pages site
+        run: |
+          mkdir sites
+          mv htmlcov sites/
+          mv coverage.xml sites/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./sites
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
